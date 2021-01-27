@@ -51,15 +51,22 @@ public class Persons
 		}
 	}
 
+	// Erstellt die Tabelle 'Person'.
 	public void createPersonsTable()
 	{
-		String sql = "CREATE TABLE PERSON (PID number PRIMARY KEY, NACHNAME varchar(100) NOT NULL, VORNAME varchar(100) NOT NULL, LIEBLINGSCOCKTAIL number, FOREIGN KEY (LIEBLINGSCOCKTAIL) REFERENCES COCKTAIL (CID));";
-
+		 String sql = "CREATE TABLE PERSON " +
+					 "(PID number PRIMARY KEY," +
+				     " NACHNAME varchar(100) NOT NULL," +
+					 " VORNAME varchar(100) NOT NULL," +
+				     " LIEBLINGSCOCKTAIL number," +
+					 " FOREIGN KEY (LIEBLINGSCOCKTAIL) REFERENCES COCKTAIL (CID))";
+		
+		// Befehl ausfuehren 
 		try
 		{
-			PreparedStatement statement = connection.prepareStatement( sql );
-			ResultSet result = statement.executeQuery();
-			showQueryResult( result );
+			Statement statement = connection.createStatement();
+			statement.execute( sql );
+			System.out.println("Tabelle PERSON erstellt");
 		}
 		catch( SQLException e ) // Fehler bei der Ausfuehrung
 		{
@@ -68,15 +75,16 @@ public class Persons
 		}
 	}
 
+	// Listet alle Personen mit allen Attributen auf.
 	public void showAllPersons()
 	{
-		String sql = "SELECT * FROM Person";
-
+		String sql = "SELECT * FROM PERSON";
+	
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );
 			ResultSet result = statement.executeQuery();
-			showQueryResult( result );
+			showQueryResult( result );	//Anzeigen des Ergebis
 		}
 		catch( SQLException e ) // Fehler bei der Ausfuehrung
 		{
@@ -104,93 +112,117 @@ public class Persons
 			return;
 		}
 
+		// Befehl ausfuehren
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );
 			statement.setString( 1, name );
 			ResultSet result = statement.executeQuery();
-			showQueryResult( result );
+			showQueryResult( result );	//Anzeigen des Ergebis
+			statement.executeQuery();
 		}
 		catch( SQLException e ) // Fehler bei der Ausfuehrung
 		{
 			System.out.println( "ERROR: " + e.getMessage() );
 			return;
 		}
-		scanner.close();
 	}
 
-
+	// Fuegt eine neue Person hinzu.
+	// Die Attribute PID, Vorname, Nachname und Lieblingscocktail werden vom Nutzer eingegeben.			
 	public void addPerson()
 	{
-		// Fuegt eine neue Person hinzu.
-		String sql = "INSERT INTO PERSON VALUES (pid=?, nachname=?, vorname=?, lieblingscocktail=?); ";
-		int pid = 0;
-		String nachname = "";
-		String vorname = "";
-		int lieblingscocktail = 0;
-
+		String sql = "INSERT INTO PERSON VALUES (?, ?, ?, ?)";
+		Integer pid;
+		String nachname;
+		String vorname;
+		Integer lieblingscocktail;
+		
 		// Eingaben sammeln
-		Scanner scanner = new Scanner( new InputStreamReader( System.in ) );
-
-		// Die Attribute PID, Vorname, Nachname und Lieblingscocktail werden vom Nutzer eingegeben.
-		try {
-			System.out.print( "PID eingeben: " );
-			pid = scanner.nextInt();
-		} catch (Exception e) {
-			System.out.println( "ERROR: " + e.getMessage() );
+		Scanner scannerPid = new Scanner( new InputStreamReader( System.in ) );
+		try
+		{
+			System.out.print( "Gewuenschte PersonenID (PID) eingeben: " );
+			pid = scannerPid.nextInt();
+		}
+		catch( Exception e )
+		{
+			System.out.println( "Fehlerhafte Eingabe!" );
 			return;
 		}
-		try {
-			System.out.print( "Nachnamen eingeben: " );
-			nachname = scanner.nextLine();
-		} catch (Exception e) {
-			System.out.println( "ERROR: " + e.getMessage() );
+		
+		Scanner scannerNachname = new Scanner( new InputStreamReader( System.in ) );
+		try
+		{
+			System.out.print( "Gewuenschten Nachnamen eingeben: " );
+			nachname = scannerNachname.nextLine();
+		}
+		catch( Exception e )
+		{
+			System.out.println( "Fehlerhafte Eingabe!" );
 			return;
 		}
-		try {
-			System.out.print( "Vornamen eingeben: " );
-			vorname = scanner.nextLine();
-		} catch (Exception e) {
-			System.out.println( "ERROR: " + e.getMessage() );
+		
+		Scanner scannerVorname = new Scanner( new InputStreamReader( System.in ) );
+		try
+		{
+			System.out.print( "Gewuenschten Vornamen eingeben: " );
+			vorname = scannerVorname.nextLine();
+		}
+		catch( Exception e )
+		{
+			System.out.println( "Fehlerhafte Eingabe!" );
 			return;
 		}
-		try {
-			System.out.print( "CocktailID eingeben: " );
-			lieblingscocktail = scanner.nextInt();
-		} catch (Exception e) {
-			System.out.println( "ERROR: " + e.getMessage() );
+		
+		Scanner scannerLieblingscocktail = new Scanner( new InputStreamReader( System.in ) );
+		try
+		{
+			System.out.print( "Nummer des Lieblingscocktail eingeben (0 wenn keiner vorhanden): " );
+			lieblingscocktail = scannerLieblingscocktail.nextInt();
+		}
+		catch( Exception e )
+		{
+			System.out.println( "Fehlerhafte Eingabe!" );
 			return;
 		}
-		scanner.close();
-
+		
+		// Befehl ausfuehren
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );
 			statement.setInt( 1, pid );
-			statement.setString(2, nachname);
-			statement.setString(3, vorname);
-			statement.setInt(4, lieblingscocktail);
-			ResultSet result = statement.executeQuery();
-			showQueryResult( result );
+			statement.setString( 2, nachname );
+			statement.setString( 3, vorname );
+			//Lieblingscocktail ist optional, deswegen wird Eingabe 0 zu null
+			if(lieblingscocktail != 0) {
+				statement.setInt( 4, lieblingscocktail );
+			} else {
+				statement.setNull( 4, java.sql.Types.INTEGER );
+			}
+			statement.executeUpdate();
+			System.out.println( "Person " + vorname + " " + nachname + " wurde hinzugefuegt." );
 		}
 		catch( SQLException e ) // Fehler bei der Ausfuehrung
 		{
 			System.out.println( "ERROR: " + e.getMessage() );
 			return;
 		}
-
+		
+	
 	}
 
+	// Loescht alle Personen.
 	public void deleteAllPersons()
 	{
-		// Loescht alle Personen.
-		String sql = "DELETE FROM Person";
-
+		String sql = "DELETE FROM PERSON";
+		
+		// Befehl ausfuehren
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );
-			ResultSet result = statement.executeQuery();
-			showQueryResult( result );
+			statement.executeUpdate();
+			System.out.println( "Alle Personen wurden geloescht." );
 		}
 		catch( SQLException e ) // Fehler bei der Ausfuehrung
 		{
@@ -199,9 +231,9 @@ public class Persons
 		}
 	}
 
+	// Loescht eine Person mit bestimmtem Vornamen.
 	public void deletePerson()
 	{
-		// Loescht eine Person mit bestimmtem Vornamen.
 		String sql = "DELETE FROM Person WHERE vorname = ?";
 		String name = "";
 
@@ -209,7 +241,7 @@ public class Persons
 		Scanner scanner = new Scanner( new InputStreamReader( System.in ) );
 		try
 		{
-			System.out.print( "Gesuchten Vornamen eingeben: " );
+			System.out.print( "Vornamen der zu loeschenden Person eingeben: " );
 			name = scanner.nextLine();
 		}
 		catch( Exception e )
@@ -218,19 +250,19 @@ public class Persons
 			return;
 		}
 
+		// Befehl ausfuehren
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );
 			statement.setString( 1, name );
-			ResultSet result = statement.executeQuery();
-			showQueryResult( result );
+			statement.executeUpdate();
+			System.out.println( "Person mit Vornamen " + name + " wurde geloescht." );
 		}
 		catch( SQLException e ) // Fehler bei der Ausfuehrung
 		{
 			System.out.println( "ERROR: " + e.getMessage() );
 			return;
 		}
-		scanner.close();
 	}
 
 	public void dropPersonsTable()
