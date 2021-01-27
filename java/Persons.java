@@ -53,12 +53,36 @@ public class Persons
 
 	public void createPersonsTable()
 	{
-		// Erstellt die Tabelle 'Person'.
+		String sql = "CREATE TABLE PERSON (PID number PRIMARY KEY, NACHNAME varchar(100) NOT NULL, VORNAME varchar(100) NOT NULL, LIEBLINGSCOCKTAIL number, FOREIGN KEY (LIEBLINGSCOCKTAIL) REFERENCES COCKTAIL (CID));";
+
+		try
+		{
+			PreparedStatement statement = connection.prepareStatement( sql );
+			ResultSet result = statement.executeQuery();
+			showQueryResult( result );
+		}
+		catch( SQLException e ) // Fehler bei der Ausfuehrung
+		{
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
 	}
 
 	public void showAllPersons()
 	{
-		// Listet alle Personen mit allen Attributen auf.
+		String sql = "SELECT * FROM Person";
+
+		try
+		{
+			PreparedStatement statement = connection.prepareStatement( sql );
+			ResultSet result = statement.executeQuery();
+			showQueryResult( result );
+		}
+		catch( SQLException e ) // Fehler bei der Ausfuehrung
+		{
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
 	}
 
 	public void findPerson()
@@ -92,22 +116,121 @@ public class Persons
 			System.out.println( "ERROR: " + e.getMessage() );
 			return;
 		}
+		scanner.close();
 	}
+
 
 	public void addPerson()
 	{
 		// Fuegt eine neue Person hinzu.
+		String sql = "INSERT INTO PERSON VALUES (pid=?, nachname=?, vorname=?, lieblingscocktail=?); ";
+		int pid = 0;
+		String nachname = "";
+		String vorname = "";
+		int lieblingscocktail = 0;
+
+		// Eingaben sammeln
+		Scanner scanner = new Scanner( new InputStreamReader( System.in ) );
+
 		// Die Attribute PID, Vorname, Nachname und Lieblingscocktail werden vom Nutzer eingegeben.
+		try {
+			System.out.print( "PID eingeben: " );
+			pid = scanner.nextInt();
+		} catch (Exception e) {
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
+		try {
+			System.out.print( "Nachnamen eingeben: " );
+			nachname = scanner.nextLine();
+		} catch (Exception e) {
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
+		try {
+			System.out.print( "Vornamen eingeben: " );
+			vorname = scanner.nextLine();
+		} catch (Exception e) {
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
+		try {
+			System.out.print( "CocktailID eingeben: " );
+			lieblingscocktail = scanner.nextInt();
+		} catch (Exception e) {
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
+		scanner.close();
+
+		try
+		{
+			PreparedStatement statement = connection.prepareStatement( sql );
+			statement.setInt( 1, pid );
+			statement.setString(2, nachname);
+			statement.setString(3, vorname);
+			statement.setInt(4, lieblingscocktail);
+			ResultSet result = statement.executeQuery();
+			showQueryResult( result );
+		}
+		catch( SQLException e ) // Fehler bei der Ausfuehrung
+		{
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
+
 	}
 
 	public void deleteAllPersons()
 	{
 		// Loescht alle Personen.
+		String sql = "DELETE FROM Person";
+
+		try
+		{
+			PreparedStatement statement = connection.prepareStatement( sql );
+			ResultSet result = statement.executeQuery();
+			showQueryResult( result );
+		}
+		catch( SQLException e ) // Fehler bei der Ausfuehrung
+		{
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
 	}
 
 	public void deletePerson()
 	{
 		// Loescht eine Person mit bestimmtem Vornamen.
+		String sql = "DELETE FROM Person WHERE vorname = ?";
+		String name = "";
+
+		// Eingaben sammeln
+		Scanner scanner = new Scanner( new InputStreamReader( System.in ) );
+		try
+		{
+			System.out.print( "Gesuchten Vornamen eingeben: " );
+			name = scanner.nextLine();
+		}
+		catch( Exception e )
+		{
+			System.out.println( "Fehlerhafte Eingabe!" );
+			return;
+		}
+
+		try
+		{
+			PreparedStatement statement = connection.prepareStatement( sql );
+			statement.setString( 1, name );
+			ResultSet result = statement.executeQuery();
+			showQueryResult( result );
+		}
+		catch( SQLException e ) // Fehler bei der Ausfuehrung
+		{
+			System.out.println( "ERROR: " + e.getMessage() );
+			return;
+		}
+		scanner.close();
 	}
 
 	public void dropPersonsTable()
