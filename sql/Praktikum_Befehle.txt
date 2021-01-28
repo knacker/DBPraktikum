@@ -1,4 +1,4 @@
--- Teilaufgabe QL
+-- Teilaufgabe 3 QL
 
 -- Aufgabe 1
 SELECT CNAME FROM COCKTAIL;
@@ -42,7 +42,7 @@ SELECT GNAME FROM GLAS,COCKTAIL WHERE GLAS.GID=COCKTAIL.GID GROUP BY GNAME HAVIN
 
 --------------------------------------------------------------------------------
 
---Teilaufgabe4 DDL DML
+--Teilaufgabe 4 DDL DML
 
 --Aufgabe 1
 CREATE TABLE MEINE_COCKTAILS (
